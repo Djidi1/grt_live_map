@@ -77,25 +77,29 @@ function App() {
 
   return (
     <div className="App">
-      <select
-        className={"route-id-select"}
-        onChange={handleSetRouteId}
-      >
-        <option value={0}>All</option>
-        {jsonData.uniqueRouteIds?.sort(
-          (a, b) => Number(a) - Number(b)
-        ).map((routeId) => (
-          <option key={routeId} value={routeId}>
-            {routeId}
-          </option>
-        ))}
-      </select>
-      <input className='refresh-countdown' type='number' readOnly value={countdown}/>
-      <button className='refresh-button' onClick={handleRefresh}>
-        <img src={refresh} className="refresh-icon" alt="refresh" />
-      </button>
+      <div className="top-menu">
+        <select
+          className={"route-id-select"}
+          onChange={handleSetRouteId}
+        >
+          <option value={0}>All</option>
+          {jsonData.uniqueRouteIds?.sort(
+            (a, b) => Number(a) - Number(b)
+          ).map((routeId) => (
+            <option key={routeId} value={routeId}>
+              {routeId}
+            </option>
+          ))}
+        </select>
+        <input className='refresh-countdown' type='number' readOnly value={countdown}/>
+        <div className='refresh-countdown-label'>update in</div>
+        <div className='refresh-countdown-label refresh-countdown-label-bottom'>seconds</div>
+        <button className='refresh-button' onClick={handleRefresh}>
+          <img src={refresh} className="refresh-icon" alt="refresh" />
+        </button>
+      </div>
       <GoogleMap
-        mapContainerStyle={{height: "100vh", width: "100vw"}}
+        mapContainerStyle={{height: "calc(100vh - 60px)", width: "100vw"}}
         center={MAP_CENTER}
         zoom={12}
       >

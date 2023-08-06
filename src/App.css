@@ -1,7 +1,14 @@
+.top-menu {
+    display: flex;
+    flex-direction: row;
+    position: relative;
+    height: 40px;
+    background-color: rgba(0, 177, 255, 0.66);
+    border-bottom: 1px solid rgba(0, 71, 102, 0.32);
+    padding: 10px;
+    column-gap: 10px;
+}
 .route-id-select{
-    position: absolute;
-    top: 9px;
-    right: 60px;
     font-size: 28px;
     width: 82px;
     z-index: 1;
@@ -14,22 +21,36 @@
 
 .refresh-countdown{
     position: absolute;
-    top: 9px;
-    right: 154px;
+    right: 10px;
+    background: transparent;
+    color: #ffffff;
     font-size: 28px;
     width: 50px;
     z-index: 1;
     text-align: center;
+    padding: 5px 0 3px 15px;
+    border: none;
+    text-shadow: 1px 1px 5px 1px #c6c4c4;
+}
+.refresh-countdown-label {
+    position: absolute;
+    top: 0;
+    right: 5px;
+    background: transparent;
+    color: #ffffff;
+    font-size: 12px;
+    width: 60px;
+    z-index: 1;
+    text-align: center;
     padding: 3px 0 3px 15px;
     border: none;
-    color: #666;
-    box-shadow: 1px 1px 5px 1px #c6c4c4;
+    text-shadow: 1px 1px 5px 1px #c6c4c4;
+}
+.refresh-countdown-label-bottom {
+    top: 40px;
 }
 
 .refresh-button {
-    position: absolute;
-    top: 9px;
-    right: 270px;
     font-size: 28px;
     width: 50px;
     z-index: 1;

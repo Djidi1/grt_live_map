@@ -4,10 +4,11 @@ import express from "express";
 import cors from "cors";
 
 const app = express();
-const port = 8080; // Use the desired port for your backend server
+const port = process.env.PORT || 8080; // Use the desired port for your backend server
 
 app.use(express.json());
 app.use(cors()); // Enable CORS for all routes
+app.set('trust proxy', true);
 
 app.get("/proxy", async (req, res) => {
     try {

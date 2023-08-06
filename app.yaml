@@ -1,0 +1,6 @@
+runtime: nodejs18
+instance_class: F1
+entrypoint: npm run server
+
+env_variables:
+  PORT: "8080"
