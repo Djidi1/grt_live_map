@@ -24,6 +24,11 @@ const MAP_OPTIONS = {
   libraries: LIBRARIES,
 }
 
+const VEHICLE_STATUS = {
+  IN_TRANSIT_TO: "in transit",
+  STOPPED_AT: "stopped",
+}
+
 function App() {
   const [originAddress, setOriginAddress] = useState("");
   const [destinationAddress, setDestinationAddress] = useState("");
@@ -225,22 +230,22 @@ function App() {
           >
             <div>
               <h3>Route: {selectedBus.vehicle.trip.routeId}</h3>
-              <p><b>Current Status:</b> {selectedBus.vehicle.currentStatus}</p>
-              <p><b>Current Stop Sequence:</b> {selectedBus.vehicle.currentStopSequence}</p>
+              <p><b>Status:</b> {VEHICLE_STATUS[selectedBus.vehicle.currentStatus]}</p>
+              <p><b>Stop #:</b> {selectedBus.vehicle.currentStopSequence}</p>
               <p><b>Start Time:</b> {selectedBus.vehicle.trip.startTime}</p>
               {busInfoData && busInfoData.stopTimes ? (
                 <table>
                   <thead>
                   <tr>
                     <th></th>
-                    <th>Stop #</th>
+                    <th>Stop&nbsp;#</th>
                     <th>Intersection</th>
                     <th>ETA</th>
                   </tr>
                   </thead>
                   <tbody>
                   {busInfoData.stopTimes
-                    .filter(item => item.StopSequence >= selectedBus.vehicle.currentStopSequence)
+                    .filter(item => item.StopSequence > selectedBus.vehicle.currentStopSequence)
                     .map(item => {
                       const direction = getBusDirection({stopId: item.StopId, selectedBus, stopsData});
                       return (
@@ -259,7 +264,7 @@ function App() {
                       )
                     })}
                   {busInfoData.stopTimes
-                      .filter(item => item.StopSequence >= selectedBus.vehicle.currentStopSequence).length === 0
+                      .filter(item => item.StopSequence > selectedBus.vehicle.currentStopSequence).length === 0
                     && (
                       <tr>
                         <td colSpan={4}>No upcoming stops</td>
