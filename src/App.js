@@ -12,7 +12,7 @@ import refresh from './refresh.svg';
 import grt_routes from './data/grt_routes.json';
 import {Counter} from "./Counter";
 import {getAllStops} from "./service/getStops";
-import {getCurrentRouteCoordinates, getMarkerIcon, getPolylinePath} from "./helpers";
+import {getMarkerIcon, getPolylinePath} from "./helpers";
 
 const MAP_CENTER = {lat: 43.46, lng: -80.50}; // Initial map center
 
@@ -41,13 +41,6 @@ function App() {
       getAllStops(routeId, setStopsData);
     }
   }, [isLoaded]);
-
-  const getMapCenter = useCallback(() => {
-    if (selectedRoute) {
-      return getCurrentRouteCoordinates(selectedRoute);
-    }
-    return MAP_CENTER;
-  }, [selectedRoute]);
 
 
   useEffect(() => {
@@ -127,7 +120,7 @@ function App() {
       </div>
       <GoogleMap
         mapContainerStyle={{height: "calc(100vh - 60px)", width: "100vw"}}
-        center={getMapCenter()}
+        center={MAP_CENTER}
         zoom={12}
       >
         {entity.map(({id, vehicle}) => (
@@ -175,12 +168,14 @@ function App() {
             }}
             title={stop.Name}
             icon={{
-              path: "M 0,0 0,0",
-              fillColor: "transparent",
-              fillOpacity: 0,
+              path: "M 2, 4 a 2,2 0 1,1 4,0 a 2,2 0 1,1 -4,0",
+              fillColor: "#00b2ff",
+              fillOpacity: 0.5,
               strokeOpacity: 0.5,
               strokeColor: "#00b2ff",
-              strokeWeight: 8,
+              strokeWeight: 4,
+              anchor: {x: 1, y: 2},
+              origin: {x: 0, y: 0},
             }}
             onClick={() => setSelectedStop(stop)}
           />
