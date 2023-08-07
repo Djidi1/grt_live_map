@@ -55,3 +55,14 @@ export const extractBusNumbers = (directionsResponse) => {
 
   return busNumbers;
 };
+
+export const getBusDirection = ({stopId, stopsData, selectedBus}) => {
+  const stop = stopsData.find(stop => stop.StopId === stopId); // get stop info from stopsData
+  if (!stop) {
+    return 0;
+  }
+  const stopLocation = { lat: stop.Latitude, lng: stop.Longitude };
+  const busLocation = { lat: selectedBus.vehicle.position.latitude, lng: selectedBus.vehicle.position.longitude };
+  // calculate direction from bus to stop
+  return window.google.maps.geometry.spherical.computeHeading(busLocation, stopLocation);
+};

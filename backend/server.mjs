@@ -10,6 +10,27 @@ app.use(express.json());
 app.use(cors()); // Enable CORS for all routes
 app.set('trust proxy', true);
 
+// get Bus info from URL https://realtimemap.grt.ca/Stop/GetBusInfo?TripId=3259768&VehicleId=21513
+app.get("/businfo/:TripId/:VehicleId", async (req, res) => {
+    try {
+        const apiUrl = `https://realtimemap.grt.ca/Stop/GetBusInfo?TripId=${req.params.TripId}&VehicleId=${req.params.VehicleId}`;
+
+        const response = await fetch(apiUrl, {
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+            },
+        });
+
+        response.json().then(function (json) {
+            res.json(json);
+        });
+
+    } catch (error) {
+        console.error("Error proxying the request:", error.message);
+        res.status(500).json({ error: "An error occurred while proxying the request." });
+    }
+});
+
 // get all stops for a route by routeId
 app.get("/stops/:RouteId", async (req, res) => {
     try {

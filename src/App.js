@@ -13,8 +13,9 @@ import refresh from './refresh.svg';
 import grt_routes from './data/grt_routes.json';
 import {Counter} from "./Counter";
 import {getAllStops} from "./service/getStops";
-import {extractBusNumbers, getMarkerIcon, getPolylinePath} from "./helpers";
+import {extractBusNumbers, getBusDirection, getMarkerIcon, getPolylinePath} from "./helpers";
 import AutocompleteInput from "./AutocopleteInput";
+import {getBusInfo} from "./service/getBusInfo";
 
 const MAP_CENTER = {lat: 43.46, lng: -80.50}; // Initial map center
 const LIBRARIES = ["places"];
@@ -29,7 +30,7 @@ function App() {
   const [directionsService, setDirectionsService] = useState(null);
   const [directions, setDirections] = useState(null);
   const [directionRoutes, setDirectionRoutes] = useState([]); // [ {id, vehicle}
-  const [selectedEntity, setSelectedEntity] = useState(null);
+  const [selectedBus, setSelectedBus] = useState(null);
   const [selectedStop, setSelectedStop] = useState(null);
   const [entity, setEntity] = useState([]); // [ {id, vehicle}
   const [jsonData, setJsonData] = useState([]);
@@ -37,6 +38,7 @@ function App() {
   const [routeId, setRouteId] = useState(null); // [ {id, vehicle}
   const [selectedRoute, setSelectedRoute] = useState(null);
   const [polylineInstances, setPolylineInstances] = useState([]);
+  const [busInfoData, setBusInfoData] = useState([]);
 
   const {isLoaded, loadError} = useLoadScript(MAP_OPTIONS);
 
@@ -60,7 +62,7 @@ function App() {
     }
   }, [directionsService, originAddress, destinationAddress]);
 
-  const handleLoad = (map) => {
+  const handleLoad = () => {
     // Create the directionsService after the map is loaded
     setDirectionsService(new window.google.maps.DirectionsService());
   };
@@ -107,8 +109,15 @@ function App() {
     getVehicles();
   };
 
+  // click on a bus Icon
   const handleMarkerClick = (entity) => {
-    setSelectedEntity(entity);
+    setSelectedBus(entity);
+    const params = {
+      tripId: entity.vehicle.trip.tripId,
+      vehicleId: entity.id,
+      setBusInfoData: setBusInfoData
+    }
+    getBusInfo(params);
   };
 
   const handleSetRouteId = (e) => {
@@ -206,19 +215,62 @@ function App() {
             />
           )
         )}
-        {selectedEntity && (
+        {selectedBus && (
           <InfoWindow
             position={{
-              lat: Number(selectedEntity.vehicle.position.latitude),
-              lng: Number(selectedEntity.vehicle.position.longitude),
+              lat: Number(selectedBus.vehicle.position.latitude),
+              lng: Number(selectedBus.vehicle.position.longitude),
             }}
-            onCloseClick={() => setSelectedEntity(null)}
+            onCloseClick={() => setSelectedBus(null)}
           >
             <div>
-              <h3>Route: {selectedEntity.vehicle.trip.routeId}</h3>
-              <p><b>Current Status:</b> {selectedEntity.vehicle.currentStatus}</p>
-              <p><b>Current Stop Sequence:</b> {selectedEntity.vehicle.currentStopSequence}</p>
-              <p><b>Start Time:</b> {selectedEntity.vehicle.trip.startTime}</p>
+              <h3>Route: {selectedBus.vehicle.trip.routeId}</h3>
+              <p><b>Current Status:</b> {selectedBus.vehicle.currentStatus}</p>
+              <p><b>Current Stop Sequence:</b> {selectedBus.vehicle.currentStopSequence}</p>
+              <p><b>Start Time:</b> {selectedBus.vehicle.trip.startTime}</p>
+              {busInfoData && busInfoData.stopTimes ? (
+                <table>
+                  <thead>
+                  <tr>
+                    <th></th>
+                    <th>Stop #</th>
+                    <th>Intersection</th>
+                    <th>ETA</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  {busInfoData.stopTimes
+                    .filter(item => item.StopSequence >= selectedBus.vehicle.currentStopSequence)
+                    .map(item => {
+                      const direction = getBusDirection({stopId: item.StopId, selectedBus, stopsData});
+                      return (
+                        <tr key={item.StopSequence}>
+                          <td>
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                 transform={`rotate(${direction - 90})`} width="24" height="24" viewBox="0 0 24 24"
+                                 fill="none">
+                              <path d="M24 12l-12-8v5h-12v6h12v5z" fill="#4499FF"/>
+                            </svg>
+                          </td>
+                          <td>{item.StopSequence}</td>
+                          <td>{item.Name}</td>
+                          <td>in {item.Minutes} min [at {item.ScheduleTime.substring(0, 5)}]</td>
+                        </tr>
+                      )
+                    })}
+                  {busInfoData.stopTimes
+                      .filter(item => item.StopSequence >= selectedBus.vehicle.currentStopSequence).length === 0
+                    && (
+                      <tr>
+                        <td colSpan={4}>No upcoming stops</td>
+                      </tr>
+                    )
+                  }
+                  </tbody>
+                </table>
+              ) : (
+                <>Loading...</>
+              )}
             </div>
           </InfoWindow>
         )}

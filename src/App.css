@@ -38,16 +38,17 @@
     right: 10px;
     background: transparent;
     color: #ffffff;
-    font-size: 28px;
+    font-size: 16px;
+    font-weight: bold;
     width: 50px;
     z-index: 1;
     text-align: center;
-    padding: 5px 0 3px 15px;
+    padding: 10px 0 3px 15px;
     border: none;
 }
 .refresh-countdown-label {
     position: absolute;
-    top: 0;
+    top: 2px;
     right: 5px;
     background: transparent;
     color: #ffffff;
@@ -59,7 +60,7 @@
     border: none;
 }
 .refresh-countdown-label-bottom {
-    top: 40px;
+    top: 36px;
 }
 
 .refresh-button {
