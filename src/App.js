@@ -51,7 +51,6 @@ function App() {
       directionsService.route(request, (response, status) => {
         if (status === window.google.maps.DirectionsStatus.OK) {
           const routes = extractBusNumbers(response.routes);
-          console.log(routes);
           setDirectionRoutes(routes);
           setDirections(response);
         } else {
