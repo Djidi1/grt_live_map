@@ -246,11 +246,11 @@ function App() {
                       return (
                         <tr key={item.StopSequence}>
                           <td>
-                            <svg xmlns="http://www.w3.org/2000/svg"
-                                 transform={`rotate(${direction - 90})`} width="24" height="24" viewBox="0 0 24 24"
-                                 fill="none">
-                              <path d="M24 12l-12-8v5h-12v6h12v5z" fill="#4499FF"/>
-                            </svg>
+                              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                <g fill="#4499FF" transform={`rotate(${direction - 90})`} transform-origin="12px 12px">
+                                  <path d="M24 12l-12-8v5h-12v6h12v5z"/>
+                                </g>
+                              </svg>
                           </td>
                           <td>{item.StopSequence}</td>
                           <td>{item.Name}</td>
