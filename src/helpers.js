@@ -35,3 +35,23 @@ export const getPolylinePath = (route) => {
   }
   return path.map((coordinate) => ({lat: coordinate[1], lng: coordinate[0]}));
 }
+
+export const extractBusNumbers = (directionsResponse) => {
+  const busNumbers = [];
+
+  directionsResponse.forEach((route) => {
+    route.legs.forEach((leg) => {
+      leg.steps.forEach((step) => {
+        if (step.travel_mode === "TRANSIT") {
+          const transitLine = step.transit.line;
+          if (transitLine && transitLine.short_name) {
+            const busNumber = transitLine.short_name;
+            busNumbers.push(busNumber);
+          }
+        }
+      });
+    });
+  });
+
+  return busNumbers;
+};

@@ -1,5 +1,6 @@
 import './App.css';
 import {
+  DirectionsRenderer,
   GoogleMap,
   InfoWindow,
   Marker,
@@ -12,11 +13,22 @@ import refresh from './refresh.svg';
 import grt_routes from './data/grt_routes.json';
 import {Counter} from "./Counter";
 import {getAllStops} from "./service/getStops";
-import {getMarkerIcon, getPolylinePath} from "./helpers";
+import {extractBusNumbers, getMarkerIcon, getPolylinePath} from "./helpers";
+import AutocompleteInput from "./AutocopleteInput";
 
 const MAP_CENTER = {lat: 43.46, lng: -80.50}; // Initial map center
+const LIBRARIES = ["places"];
+const MAP_OPTIONS = {
+  googleMapsApiKey: "AIzaSyBjqp9kmhvyzsAiPp0PSMQPW5DdoXmcaxY",
+  libraries: LIBRARIES,
+}
 
 function App() {
+  const [originAddress, setOriginAddress] = useState("");
+  const [destinationAddress, setDestinationAddress] = useState("");
+  const [directionsService, setDirectionsService] = useState(null);
+  const [directions, setDirections] = useState(null);
+  const [directionRoutes, setDirectionRoutes] = useState([]); // [ {id, vehicle}
   const [selectedEntity, setSelectedEntity] = useState(null);
   const [selectedStop, setSelectedStop] = useState(null);
   const [entity, setEntity] = useState([]); // [ {id, vehicle}
@@ -26,9 +38,33 @@ function App() {
   const [selectedRoute, setSelectedRoute] = useState(null);
   const [polylineInstances, setPolylineInstances] = useState([]);
 
-  const {isLoaded, loadError} = useLoadScript({
-    googleMapsApiKey: "AIzaSyBjqp9kmhvyzsAiPp0PSMQPW5DdoXmcaxY", // Replace with your API key
-  });
+  const {isLoaded, loadError} = useLoadScript(MAP_OPTIONS);
+
+  const onDirectionsSubmit = useCallback(() => {
+    if (directionsService && originAddress && destinationAddress) {
+      const request = {
+        origin: originAddress,
+        destination: destinationAddress,
+        travelMode: window.google.maps.TravelMode.TRANSIT,
+      };
+
+      directionsService.route(request, (response, status) => {
+        if (status === window.google.maps.DirectionsStatus.OK) {
+          const routes = extractBusNumbers(response.routes);
+          console.log(routes);
+          setDirectionRoutes(routes);
+          setDirections(response);
+        } else {
+          console.error("Directions request failed:", status);
+        }
+      });
+    }
+  }, [directionsService, originAddress, destinationAddress]);
+
+  const handleLoad = (map) => {
+    // Create the directionsService after the map is loaded
+    setDirectionsService(new window.google.maps.DirectionsService());
+  };
 
   const getVehicles = useCallback(() => {
     if (isLoaded) {
@@ -58,6 +94,15 @@ function App() {
       setEntity(jsonData.entities);
     }
   }, [jsonData, routeId]);
+
+  // get entities by directionRoutes
+  useEffect(() => {
+    if (directionRoutes.length === 0) {
+      return;
+    }
+    const entities = jsonData.entities.filter((entity) => directionRoutes.includes(entity.vehicle.trip.routeId));
+    setEntity(entities);
+  }, [directionRoutes, jsonData]);
 
   const handleRefresh = () => {
     getVehicles();
@@ -99,6 +144,22 @@ function App() {
 
   return (
     <div className="App">
+      <div className="direction-form">
+        <AutocompleteInput
+          value={originAddress}
+          onChange={setOriginAddress}
+          onSelect={setOriginAddress}
+          placeholder="Enter origin"
+        />
+
+        <AutocompleteInput
+          value={destinationAddress}
+          onChange={setDestinationAddress}
+          onSelect={setDestinationAddress}
+          placeholder="Enter destination"
+        />
+        <button className="get-direction-button" onClick={onDirectionsSubmit}>GO</button>
+      </div>
       <div className="top-menu">
         <div className="bus-route-label">
           Bus Route:
@@ -125,7 +186,9 @@ function App() {
         mapContainerStyle={{height: "calc(100vh - 60px)", width: "100vw"}}
         center={MAP_CENTER}
         zoom={12}
+        onLoad={handleLoad}
       >
+        {directions && <DirectionsRenderer directions={directions}/>}
         {entity.map(({id, vehicle}) => (
             <Marker
               key={id}
