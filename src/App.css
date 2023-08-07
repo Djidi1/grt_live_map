@@ -1,3 +1,7 @@
+.App {
+    font-family: Roboto, Arial, sans-serif;
+}
+
 .top-menu {
     display: flex;
     flex-direction: row;
