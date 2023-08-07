@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 
 export const REFRESH_INTERVAL = 60; // seconds
 
-export const Counter = ({routeId, getVehicles}) => {
+const Counter = ({routeId, getVehicles}) => {
   const [countdown, setCountdown] = useState(REFRESH_INTERVAL);
 
   // countdown timer
@@ -25,3 +25,5 @@ export const Counter = ({routeId, getVehicles}) => {
     </>
   );
 }
+
+export default Counter;

@@ -64,6 +64,7 @@
 }
 
 .refresh-button {
+    display: none;
     font-size: 28px;
     width: 50px;
     z-index: 1;
