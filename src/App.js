@@ -151,7 +151,6 @@ function App() {
           onSelect={setOriginAddress}
           placeholder="Enter origin"
         />
-
         <AutocompleteInput
           value={destinationAddress}
           onChange={setDestinationAddress}
