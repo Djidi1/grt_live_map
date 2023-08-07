@@ -10,6 +10,27 @@ app.use(express.json());
 app.use(cors()); // Enable CORS for all routes
 app.set('trust proxy', true);
 
+// get all stops for a route by routeId
+app.get("/stops/:RouteId", async (req, res) => {
+    try {
+        const apiUrl = `https://realtimemap.grt.ca/Stop/GetByRouteId?routeId=${req.params.RouteId}`;
+
+        const response = await fetch(apiUrl, {
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+            },
+        });
+
+        response.json().then(function (json) {
+            res.json(json);
+        });
+
+    } catch (error) {
+        console.error("Error proxying the request:", error.message);
+        res.status(500).json({ error: "An error occurred while proxying the request." });
+    }
+});
+
 app.get("/proxy", async (req, res) => {
     try {
         const apiUrl = "https://webapps.regionofwaterloo.ca/api/grt-routes/api/vehiclepositions";
@@ -17,8 +38,6 @@ app.get("/proxy", async (req, res) => {
         const response = await fetch(apiUrl, {
             headers: {
                 "x-api-key": "<redacted>",
-                // replace with your GTFS-realtime source's auth token
-                // e.g. x-api-key is the header value used for NY's MTA GTFS APIs
             },
         });
         if (!response.ok) {

@@ -1,38 +1,30 @@
 import './App.css';
 import {
-  GoogleMap, InfoWindow, Marker, Polygon, Polyline, useLoadScript
+  GoogleMap,
+  InfoWindow,
+  Marker,
+  Polyline,
+  useLoadScript
 } from "@react-google-maps/api";
 import React, {useCallback, useEffect, useState} from "react";
 import getAllVehicles from "./service/getVehicles";
 import refresh from './refresh.svg';
-import bus from './bus.png';
 import grt_routes from './data/grt_routes.json';
 import {Counter} from "./Counter";
+import {getAllStops} from "./service/getStops";
+import {getCurrentRouteCoordinates, getMarkerIcon, getPolylinePath} from "./helpers";
 
 const MAP_CENTER = {lat: 43.46, lng: -80.50}; // Initial map center
 
-const getMarkerIcon = (routeId) => {
-  return {
-    url: bus,
-    fillColor: "#00b2ff",
-    fillOpacity: 0.9,
-    strokeColor: "#ffffff",
-    strokeWeight: 1,
-    scale: 0.07,
-    scaledSize: {width: 32, height: 48},
-    labelOrigin: {x: 16, y: 30},
-    label: {text: routeId, color: "#ffffff", fontSize: "12px", fontWeight: "bold"},
-    anchor: {x: 16, y: 42},
-    origin: {x: 0, y: 0},
-  };
-};
-
 function App() {
   const [selectedEntity, setSelectedEntity] = useState(null);
+  const [selectedStop, setSelectedStop] = useState(null);
   const [entity, setEntity] = useState([]); // [ {id, vehicle}
   const [jsonData, setJsonData] = useState([]);
+  const [stopsData, setStopsData] = useState([]);
   const [routeId, setRouteId] = useState(null); // [ {id, vehicle}
   const [selectedRoute, setSelectedRoute] = useState(null);
+  const [polylineInstances, setPolylineInstances] = useState([]);
 
   const {isLoaded, loadError} = useLoadScript({
     googleMapsApiKey: "AIzaSyBjqp9kmhvyzsAiPp0PSMQPW5DdoXmcaxY", // Replace with your API key
@@ -43,6 +35,19 @@ function App() {
       getAllVehicles(setJsonData);
     }
   }, [isLoaded]);
+
+  const getStops = useCallback((routeId) => {
+    if (isLoaded) {
+      getAllStops(routeId, setStopsData);
+    }
+  }, [isLoaded]);
+
+  const getMapCenter = useCallback(() => {
+    if (selectedRoute) {
+      return getCurrentRouteCoordinates(selectedRoute);
+    }
+    return MAP_CENTER;
+  }, [selectedRoute]);
 
 
   useEffect(() => {
@@ -76,14 +81,12 @@ function App() {
       // get route from json file grt_routes.features.properties.Route
       const routes = grt_routes.features.filter((route) => route.properties.Route === Number(routeId));
       setSelectedRoute(routes[0]);
+      getStops(routeId);
       const entityRoute = jsonData.entities.filter((entity) => entity.vehicle.trip.routeId === routeId);
       setEntity(entityRoute);
     }
     setRouteId(routeId);
   }
-
-
-  const [polylineInstances, setPolylineInstances] = useState([]);
 
   // Function to add polyline instances to the state
   const addPolylineInstance = (polyline) => {
@@ -124,7 +127,7 @@ function App() {
       </div>
       <GoogleMap
         mapContainerStyle={{height: "calc(100vh - 60px)", width: "100vw"}}
-        center={MAP_CENTER}
+        center={getMapCenter()}
         zoom={12}
       >
         {entity.map(({id, vehicle}) => (
@@ -162,63 +165,53 @@ function App() {
             </div>
           </InfoWindow>
         )}
-        {/*  Draw Polygon from provided points */}
-        {selectedRoute && selectedRoute.geometry.type === "LineString" && (
-          <Polygon
+        {/* Draw Markers with bus stops */}
+        {stopsData.map((stop) => (
+          <Marker
+            key={stop.StopId}
+            position={{
+              lat: stop.Latitude,
+              lng: stop.Longitude,
+            }}
+            title={stop.Name}
+            icon={{
+              path: "M 0,0 0,0",
+              fillColor: "transparent",
+              fillOpacity: 0,
+              strokeOpacity: 0.5,
+              strokeColor: "#00b2ff",
+              strokeWeight: 8,
+            }}
+            onClick={() => setSelectedStop(stop)}
+          />
+        ))}
+        {selectedStop && (
+          <InfoWindow
+            position={{
+              lat: selectedStop.Latitude,
+              lng: selectedStop.Longitude,
+            }}
+            onCloseClick={() => setSelectedStop(null)}
+          >
+            <div>
+              <h3>{selectedStop.Name}</h3>
+              <p><b>Stop ID:</b> {selectedStop.StopId}</p>
+            </div>
+          </InfoWindow>
+        )}
+        {/*  Draw Polyline from provided points */}
+        {selectedRoute && (
+          <Polyline
             key={selectedRoute.properties.Route}
-            path={selectedRoute.geometry.coordinates.map((coordinate) => {
-              if (Array.isArray(coordinate[0])) {
-                return ({
-                    lat: coordinate[0][1],
-                    lng: coordinate[0][0],
-                  }
-                )
-              }
-              return ({
-                  lat: coordinate[1],
-                  lng: coordinate[0],
-                }
-              )
-            })}
+            path={getPolylinePath(selectedRoute)}
             options={{
               strokeColor: "#00B1FF",
               strokeOpacity: 0.8,
               strokeWeight: 2,
-              fillColor: "transparent", // transparent
-              fillOpacity: 0.0,
             }}
             onLoad={addPolylineInstance}
           />
         )}
-        {
-          selectedRoute && selectedRoute.geometry.type === "MultiLineString" && (
-            selectedRoute.geometry.coordinates.map((coordinate, index) => (
-              <Polyline
-                key={index}
-                path={coordinate.map((coordinate) => {
-                  if (Array.isArray(coordinate[0])) {
-                    return ({
-                        lat: coordinate[0][1],
-                        lng: coordinate[0][0],
-                      }
-                    )
-                  }
-                  return ({
-                      lat: coordinate[1],
-                      lng: coordinate[0],
-                    }
-                  )
-                })}
-                options={{
-                  strokeColor: "#00B1FF",
-                  strokeOpacity: 0.8,
-                  strokeWeight: 2,
-                }}
-                onLoad={addPolylineInstance}
-              />
-            ))
-          )
-        }
       </GoogleMap>
     </div>
   );
