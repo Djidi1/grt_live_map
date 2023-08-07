@@ -8,15 +8,24 @@
     padding: 10px;
     column-gap: 10px;
 }
+.bus-route-label {
+    background: transparent;
+    color: #ffffff;
+    font-size: 14px;
+    width: 50px;
+    z-index: 1;
+    text-align: center;
+    padding: 3px 0 3px 3px;
+    border: none;
+}
 .route-id-select{
-    font-size: 28px;
+    font-size: 20px;
     width: 82px;
     z-index: 1;
     text-align: right;
     padding: 3px;
     border: none;
     color: #666;
-    box-shadow: 1px 1px 5px 1px #c6c4c4;
 }
 
 .refresh-countdown{
@@ -30,7 +39,6 @@
     text-align: center;
     padding: 5px 0 3px 15px;
     border: none;
-    text-shadow: 1px 1px 5px 1px #c6c4c4;
 }
 .refresh-countdown-label {
     position: absolute;
@@ -44,7 +52,6 @@
     text-align: center;
     padding: 3px 0 3px 15px;
     border: none;
-    text-shadow: 1px 1px 5px 1px #c6c4c4;
 }
 .refresh-countdown-label-bottom {
     top: 40px;
@@ -55,14 +62,15 @@
     width: 50px;
     z-index: 1;
     text-align: center;
-    padding: 3px;
     border: none;
-    color: #666;
-    box-shadow: 1px 1px 5px 1px #c6c4c4;
+    border-radius: 40px;
+    background-color: #ffffff;
     cursor: pointer;
 }
 
 .refresh-icon {
-    width: 16px;
-    height: 16px;
+    position: relative;
+    top: 3px;
+    width: 28px;
+    height: 28px;
 }

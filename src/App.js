@@ -100,6 +100,9 @@ function App() {
   return (
     <div className="App">
       <div className="top-menu">
+        <div className="bus-route-label">
+          Bus Route:
+        </div>
         <select
           className={"route-id-select"}
           onChange={handleSetRouteId}
