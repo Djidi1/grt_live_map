@@ -1,4 +1,4 @@
-import bus from "./bus.png";
+import bus from "./assets/bus.png";
 
 export const getCurrentRouteCoordinates = (route) => {
   let coordinates = [];
@@ -66,3 +66,14 @@ export const getBusDirection = ({stopId, stopsData, selectedBus}) => {
   // calculate direction from bus to stop
   return window.google.maps.geometry.spherical.computeHeading(busLocation, stopLocation);
 };
+
+export const getMyLocation = (setMyLocation) => {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition((position) => {
+      setMyLocation({
+        lat: position.coords.latitude,
+        lng: position.coords.longitude,
+      });
+    });
+  }
+}

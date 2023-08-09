@@ -8,10 +8,10 @@ import {
 import {getAllStops} from "./service/getStops";
 import getAllVehicles from "./service/getVehicles";
 
-import {getPolylinePath} from "./helpers";
+import {getMyLocation, getPolylinePath} from "./helpers";
 
 import {MAP_CENTER, MAP_OPTIONS} from "./constants";
-import {AutocompleteForm, BusMarkers, StopMarkers, TopMenu} from "./components";
+import {AutocompleteForm, BusMarkers, StopMarkers, TopMenu, MyLocationMarker} from "./components";
 
 import './App.css';
 
@@ -25,6 +25,8 @@ function App() {
   const [routeId, setRouteId] = useState(null); // [ {id, vehicle}
   const [selectedRoute, setSelectedRoute] = useState(null);
   const [polylineInstances, setPolylineInstances] = useState([]);
+  const [myLocation, setMyLocation] = useState(null);
+  const [mapCenter, setMapCenter] = useState(MAP_CENTER);
 
   const {isLoaded, loadError} = useLoadScript(MAP_OPTIONS);
 
@@ -43,6 +45,7 @@ function App() {
 
   useEffect(() => {
     getVehicles();
+    getMyLocation(setMyLocation);
   }, [getVehicles, isLoaded]);
 
   useEffect(() => {
@@ -75,12 +78,18 @@ function App() {
     setPolylineInstances((prevInstances) => [...prevInstances, polyline]);
   };
 
+  const handleSetMyLocation = useCallback(() => {
+    getMyLocation(setMyLocation);
+    setMapCenter(myLocation);
+  }, [myLocation]);
+
   if (loadError) return <div>Error loading Google Maps</div>;
   if (!isLoaded) return <div>Loading...</div>;
 
   return (
     <div className="App">
       <AutocompleteForm
+        myLocation={myLocation}
         directionsService={directionsService}
         setDirections={setDirections}
         setDirectionRoutes={setDirectionRoutes}
@@ -96,13 +105,15 @@ function App() {
         setBuses={setBuses}
         setRouteId={setRouteId}
         setPolylineInstances={setPolylineInstances}
+        handleSetMyLocation={handleSetMyLocation}
       />
       <GoogleMap
         mapContainerStyle={{height: "calc(100vh - 60px)", width: "100vw"}}
-        center={MAP_CENTER}
+        center={mapCenter}
         zoom={12}
         onLoad={handleLoad}
       >
+        <MyLocationMarker myLocation={myLocation}/>
         {directions && <DirectionsRenderer directions={directions}/>}
         <BusMarkers buses={buses} stopsData={stopsData}/>
         {/* Draw Markers with bus stops */}

@@ -5,6 +5,7 @@ import Counter from "./Counter";
 import BusMarkers from "./BusMarkers";
 import StopMarkers from "./StopMarkers";
 import TopMenu from "./TopMenu";
+import MyLocationMarker from "./MyLocationMarker";
 
 export {
   AutocompleteForm,
@@ -13,5 +14,6 @@ export {
   Counter,
   BusMarkers,
   StopMarkers,
+  MyLocationMarker,
   TopMenu,
 };
