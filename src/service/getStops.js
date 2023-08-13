@@ -18,7 +18,8 @@ export const getAllStops = (routeId, setStopsData) => {
     const fetchStops = async () => {
         try {
             const response = await axios.get(API_STOPS_URL+routeId);
-            setStopsData((data) => getUniqueStops([...data, ...response.data]));
+            const stops = response.data.map((stop) => ({...stop, RouteId: routeId}));
+            setStopsData((data) => getUniqueStops([...data, ...stops]));
         } catch (error) {
             console.error("Error fetching GTFS data:", error.message);
         }

@@ -5,7 +5,6 @@ import {
   Polyline,
   useLoadScript
 } from "@react-google-maps/api";
-import {getAllStops} from "./service/getStops";
 import getAllVehicles from "./service/getVehicles";
 
 import {getMyLocation, getPolylinePath} from "./helpers";
@@ -14,15 +13,16 @@ import {MAP_CENTER, MAP_OPTIONS} from "./constants";
 import {AutocompleteForm, BusMarkers, StopMarkers, TopMenu, MyLocationMarker} from "./components";
 
 import './App.css';
+import {getBusesOnRoutes} from "./service/getBusesOnRoutes";
 
 function App() {
   const [directionsService, setDirectionsService] = useState(null);
   const [directions, setDirections] = useState(null);
-  const [directionRoutes, setDirectionRoutes] = useState([]); // [ {id, vehicle}
-  const [buses, setBuses] = useState([]); // [ {id, vehicle}
+  const [directionRoutes, setDirectionRoutes] = useState([]); //
+  const [buses, setBuses] = useState([]); //
   const [jsonData, setJsonData] = useState([]);
   const [stopsData, setStopsData] = useState([]);
-  const [routeId, setRouteId] = useState(null); // [ {id, vehicle}
+  const [routeId, setRouteId] = useState("-1"); // -1 - turned off, 0 - all routes, 1-* - route number
   const [selectedRoute, setSelectedRoute] = useState(null);
   const [polylineInstances, setPolylineInstances] = useState([]);
   const [myLocation, setMyLocation] = useState(null);
@@ -60,18 +60,13 @@ function App() {
     }
   }, [jsonData, routeId]);
 
-  // get entities by directionRoutes
+  // get buses on Route from directionRoutes
   useEffect(() => {
     if (directionRoutes.length === 0) {
       return;
     }
-    const entities = jsonData.entities.filter((entity) => directionRoutes.includes(entity.vehicle.trip.routeId));
-    setBuses(entities);
-    // get stops by directionRoutes
-    directionRoutes.forEach((routeId) => {
-      getAllStops(routeId, setStopsData);
-    });
-  }, [directionRoutes, jsonData]);
+    getBusesOnRoutes(directionRoutes, setBuses);
+  }, [directionRoutes]);
 
   // Function to add polyline instances to the state
   const addPolylineInstance = (polyline) => {
@@ -106,6 +101,7 @@ function App() {
         setRouteId={setRouteId}
         setPolylineInstances={setPolylineInstances}
         handleSetMyLocation={handleSetMyLocation}
+        liveBusesFunction={() => getBusesOnRoutes(directionRoutes, setBuses)}
       />
       <GoogleMap
         mapContainerStyle={{height: "calc(100vh - 60px)", width: "100vw"}}
@@ -117,7 +113,7 @@ function App() {
         {directions && <DirectionsRenderer directions={directions}/>}
         <BusMarkers buses={buses} stopsData={stopsData}/>
         {/* Draw Markers with bus stops */}
-        <StopMarkers stopsData={stopsData}/>
+        <StopMarkers stopsData={stopsData.filter((stop) => stop.RouteId === routeId)}/>
         {/*  Draw Polyline from provided points */}
         {selectedRoute && (
           <Polyline

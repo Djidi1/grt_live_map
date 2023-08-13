@@ -17,7 +17,8 @@ const TopMenu = (props) => {
         setBuses,
         setRouteId,
         setPolylineInstances,
-        handleSetMyLocation
+        handleSetMyLocation,
+        liveBusesFunction
     } = props;
 
     const handleRefresh = () => {
@@ -33,7 +34,7 @@ const TopMenu = (props) => {
     const handleSetRouteId = (e) => {
         const routeId = e.target.value;
         clearPolygons();
-        if (routeId !== "0") {
+        if (routeId !== "0" && routeId !== "-1") {
             // get route from json file grt_routes.features.properties.Route
             const routes = grt_routes.features.filter((route) => route.properties.Route === Number(routeId));
             setSelectedRoute(routes[0]);
@@ -60,7 +61,8 @@ const TopMenu = (props) => {
                 className={"route-id-select"}
                 onChange={handleSetRouteId}
             >
-                <option value={0}>All</option>
+                <option value="-1">None</option>
+                <option value="0">All</option>
                 {jsonData.uniqueRouteIds?.sort(
                     (a, b) => Number(a) - Number(b)
                 ).map((routeId) => (
@@ -75,7 +77,11 @@ const TopMenu = (props) => {
             <button className='refresh-button' onClick={handleRefresh} style={{display: "none"}}>
                 <img src={refresh} className="refresh-icon" alt="refresh"/>
             </button>
-            <Counter routeId={routeId} getVehicles={getVehicles}/>
+            <Counter
+                routeId={routeId}
+                getVehicles={getVehicles}
+                liveBusesFunction={routeId !== "-1" ? getVehicles : liveBusesFunction}
+            />
         </div>
     );
 }

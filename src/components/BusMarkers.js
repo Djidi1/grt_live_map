@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 import {Marker} from "@react-google-maps/api";
-import {getMarkerIcon} from "../helpers";
+import {getBusDirectionOnRoute, getMarkerIcon} from "../helpers";
 import {BusInfoWindow} from "./index";
 import {getBusInfo} from "../service/getBusInfo";
 
@@ -16,9 +16,12 @@ const BusMarkers = ({buses, stopsData}) => {
     }
     getBusInfo(params);
   };
+
   return (
     <>
-      {buses.map(({id, vehicle}) => (
+      {buses.map(({id, vehicle, nextStopLocation}) => {
+        const direction = getBusDirectionOnRoute({vehicle, nextStopLocation});
+        return (
           <Marker
             key={id}
             position={{
@@ -33,9 +36,9 @@ const BusMarkers = ({buses, stopsData}) => {
               fontSize: "12px",
               fontWeight: "bold"
             }}
-            icon={getMarkerIcon(vehicle.trip.routeId)}
+            icon={getMarkerIcon({routeId: vehicle.trip.routeId, direction})}
           />
-        )
+        )}
       )}
       {selectedBus && (
         <BusInfoWindow

@@ -27,7 +27,6 @@ const BusInfoWindow = ({selectedBus, busInfoData, stopsData, setSelectedBus, set
           <table>
             <thead>
             <tr>
-              <th></th>
               <th>Stop&nbsp;#</th>
               <th>Intersection</th>
               <th>ETA</th>
@@ -37,16 +36,8 @@ const BusInfoWindow = ({selectedBus, busInfoData, stopsData, setSelectedBus, set
             {busInfoData.stopTimes
               .filter(item => item.StopSequence > selectedBus.vehicle.currentStopSequence)
               .map(item => {
-                const direction = getBusDirection({stopId: item.StopId, selectedBus, stopsData});
                 return (
                   <tr key={item.StopSequence}>
-                    <td>
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                        <g fill="#4499FF" transform={`rotate(${direction - 90})`} transform-origin="12px 12px">
-                          <path d="M24 12l-12-8v5h-12v6h12v5z"/>
-                        </g>
-                      </svg>
-                    </td>
                     <td>{item.StopSequence}</td>
                     <td>{item.Name}</td>
                     <td>in {item.Minutes} min [at {item.ScheduleTime.substring(0, 5)}]</td>
@@ -57,7 +48,7 @@ const BusInfoWindow = ({selectedBus, busInfoData, stopsData, setSelectedBus, set
                 .filter(item => item.StopSequence > selectedBus.vehicle.currentStopSequence).length === 0
               && (
                 <tr>
-                  <td colSpan={4}>No upcoming stops</td>
+                  <td colSpan={3}>No upcoming stops</td>
                 </tr>
               )
             }

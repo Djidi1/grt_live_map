@@ -1,21 +1,26 @@
 import React, {useEffect, useState} from "react";
 
 export const REFRESH_INTERVAL = 60; // seconds
+let interval;
 
-const Counter = ({routeId, getVehicles}) => {
+const Counter = ({routeId, getVehicles, liveBusesFunction}) => {
   const [countdown, setCountdown] = useState(REFRESH_INTERVAL);
 
   // countdown timer
   useEffect(() => {
     if (countdown === 0) {
-      getVehicles();
+      if (routeId === "-1") {
+          liveBusesFunction();
+      } else {
+          getVehicles();
+      }
       setCountdown(REFRESH_INTERVAL);
     }
-    const interval = setInterval(() => {
+    interval = setInterval(() => {
       setCountdown(countdown - 1);
     }, 1000);
     return () => clearInterval(interval);
-  }, [countdown, routeId, getVehicles]);
+  }, [countdown, routeId, getVehicles, liveBusesFunction]);
 
   return (
     <>
