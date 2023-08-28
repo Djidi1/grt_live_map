@@ -14,7 +14,6 @@ const TopMenu = (props) => {
         getVehicles,
         setStopsData,
         setSelectedRoute,
-        setBuses,
         setRouteId,
         setPolylineInstances,
         handleSetMyLocation,
@@ -39,8 +38,6 @@ const TopMenu = (props) => {
             const routes = grt_routes.features.filter((route) => route.properties.Route === Number(routeId));
             setSelectedRoute(routes[0]);
             getStops(routeId);
-            const entityRoute = jsonData.entities.filter((entity) => entity.vehicle.trip.routeId === routeId);
-            setBuses(entityRoute);
         }
         setRouteId(routeId);
     };

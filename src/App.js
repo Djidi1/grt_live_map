@@ -72,6 +72,8 @@ function App() {
   if (loadError) return <div>Error loading Google Maps</div>;
   if (!isLoaded) return <div>Loading...</div>;
 
+  const routeIds = directionRoutes.length > 0 ? directionRoutes : [routeId];
+
   return (
     <div className="App">
       <AutocompleteForm
@@ -88,11 +90,9 @@ function App() {
         polylineInstances={polylineInstances}
         setStopsData={setStopsData}
         setSelectedRoute={setSelectedRoute}
-        // setBuses={setBuses}
         setRouteId={setRouteId}
         setPolylineInstances={setPolylineInstances}
         handleSetMyLocation={handleSetMyLocation}
-        // liveBusesFunction={() => getBusesOnRoutes(directionRoutes, setBuses)}
       />
       <GoogleMap
         mapContainerStyle={{height: "calc(100vh - 60px)", width: "100vw"}}
@@ -103,7 +103,7 @@ function App() {
       >
         <MyLocationMarker myLocation={myLocation}/>
         {directions && <DirectionsRenderer directions={directions}/>}
-        {directionRoutes.length > 0 && <BusMarkers directionRoutes={directionRoutes} stopsData={stopsData}/>}
+        {routeIds.length > 0 && <BusMarkers directionRoutes={routeIds} stopsData={stopsData}/>}
         {/* Draw Markers with bus stops */}
         <StopMarkers stopsData={stopsData.filter((stop) => stop.RouteId === routeId)}/>
         {/*  Draw Polyline from provided points */}
