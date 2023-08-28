@@ -1,9 +1,8 @@
 import React from "react";
-import {getBusDirection} from "../helpers";
 import {InfoWindow} from "@react-google-maps/api";
 import {VEHICLE_STATUS} from "../constants";
 
-const BusInfoWindow = ({selectedBus, busInfoData, stopsData, setSelectedBus, setBusInfoData}) => {
+const BusInfoWindow = ({selectedBus, busInfoData, setSelectedBus, setBusInfoData}) => {
 
   const onBusInfoClose = () => {
     setSelectedBus(null);

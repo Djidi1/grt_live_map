@@ -4,9 +4,10 @@ import {getBusDirectionOnRoute, getMarkerIcon} from "../helpers";
 import {BusInfoWindow} from "./index";
 import {getBusInfo} from "../service/getBusInfo";
 import {getBusesOnRoutes} from "../service/getBusesOnRoutes";
+import {REFRESH_TIMEOUT} from "../constants";
 
 
-const CALLS_TIMEOUT = 30 * 1000;
+const CALLS_TIMEOUT = REFRESH_TIMEOUT * 1000;
 const REPEATS = (CALLS_TIMEOUT / 1000) * 2;
 const REPEATS_TIMEOUT = CALLS_TIMEOUT / REPEATS;
 
@@ -41,7 +42,7 @@ const moveBuses = (busesWithPoints, setMarkers) => {
     return () => clearInterval(interval);
 }
 
-const BusMarkers = ({directionRoutes, stopsData}) => {
+const BusMarkers = ({directionRoutes}) => {
     const [selectedBus, setSelectedBus] = useState(null);
     const [busInfoData, setBusInfoData] = useState([]);
     const [markers, setMarkers] = useState([]);
@@ -61,13 +62,12 @@ const BusMarkers = ({directionRoutes, stopsData}) => {
 
     useEffect(() => {
         const isSomeBusMoving = buses.some((bus) => bus.vehicle.points && bus.vehicle.points.length > 0);
-        console.log('isSomeBusMoving', isSomeBusMoving);
 
         if (buses.length === 0 || !isSomeBusMoving) {
             setMarkers(buses);
             return;
         }
-        console.log('Start moving buses', buses);
+
         const moveBusesInterval = moveBuses(buses, setMarkers);
         return () => moveBusesInterval();
     }, [buses]);
@@ -112,7 +112,6 @@ const BusMarkers = ({directionRoutes, stopsData}) => {
                 <BusInfoWindow
                     selectedBus={selectedBus}
                     busInfoData={busInfoData}
-                    stopsData={stopsData}
                     setSelectedBus={setSelectedBus}
                     setBusInfoData={setBusInfoData}
                 />

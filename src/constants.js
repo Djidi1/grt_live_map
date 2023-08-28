@@ -3,6 +3,8 @@ const MAP_CENTER = {
   lng: -80.50
 }; // Initial map center
 
+export const REFRESH_TIMEOUT = 30; // Refresh timeout in seconds
+
 const LIBRARIES = ["places"];
 const MAP_OPTIONS = {
   googleMapsApiKey: "AIzaSyBjqp9kmhvyzsAiPp0PSMQPW5DdoXmcaxY",

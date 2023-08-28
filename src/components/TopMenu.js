@@ -9,15 +9,14 @@ const TopMenu = (props) => {
     const {
         isLoaded,
         jsonData,
-        routeId,
         polylineInstances,
         getVehicles,
         setStopsData,
         setSelectedRoute,
+        routeId,
         setRouteId,
         setPolylineInstances,
         handleSetMyLocation,
-        liveBusesFunction
     } = props;
 
     const handleRefresh = () => {
@@ -57,6 +56,7 @@ const TopMenu = (props) => {
             <select
                 className={"route-id-select"}
                 onChange={handleSetRouteId}
+                value={routeId}
             >
                 <option value="-1">None</option>
                 <option value="0">All</option>
@@ -74,11 +74,7 @@ const TopMenu = (props) => {
             <button className='refresh-button' onClick={handleRefresh} style={{display: "none"}}>
                 <img src={refresh} className="refresh-icon" alt="refresh"/>
             </button>
-            <Counter
-                routeId={routeId}
-                getVehicles={getVehicles}
-                liveBusesFunction={routeId !== "-1" ? getVehicles : liveBusesFunction}
-            />
+            <Counter />
         </div>
     );
 }

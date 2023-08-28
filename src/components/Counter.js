@@ -1,28 +1,20 @@
 import React, {useEffect, useState} from "react";
-
-export const REFRESH_INTERVAL_ALL = 30; // seconds
-export const REFRESH_INTERVAL_ROUTE = 10; // seconds
+import {REFRESH_TIMEOUT} from "../constants";
 let interval;
 
-const Counter = ({routeId, getVehicles, liveBusesFunction}) => {
-  const [countdown, setCountdown] = useState(REFRESH_INTERVAL_ALL);
+const Counter = () => {
+  const [countdown, setCountdown] = useState(REFRESH_TIMEOUT);
 
   // countdown timer
   useEffect(() => {
     if (countdown === 0) {
-      const REFRESH_INTERVAL = routeId === "-1" ? REFRESH_INTERVAL_ROUTE : REFRESH_INTERVAL_ALL;
-      if (routeId === "-1") {
-          // liveBusesFunction();
-      } else {
-          // getVehicles();
-      }
-      setCountdown(REFRESH_INTERVAL);
+      setCountdown(REFRESH_TIMEOUT);
     }
     interval = setInterval(() => {
       setCountdown(countdown - 1);
     }, 1000);
     return () => clearInterval(interval);
-  }, [countdown, routeId, getVehicles, liveBusesFunction]);
+  }, [countdown]);
 
   return (
     <>

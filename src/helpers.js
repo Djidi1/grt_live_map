@@ -102,7 +102,6 @@ export const isEquals = (obj1, obj2) => {
 export const getPointsBetween = (start, end) => {
   const ITERATIONS = 20;
   if (isEquals(start, end)) {
-    console.log('start and end points are equal');
     return [];
   }
   const points = [];
