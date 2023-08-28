@@ -1,20 +1,8 @@
-import bus from "./assets/bus.png";
-
-export const getCurrentRouteCoordinates = (route) => {
-  let coordinates = [];
-  if (route.geometry.type === 'LineString') {
-    coordinates = route.geometry.coordinates[0];
-  } else {
-    coordinates = route.geometry.coordinates[0][0];
-  }
-  return {lat: coordinates[1], lng: coordinates[0]};
-}
-
-
 export const getMarkerIcon = ({routeId, direction}) => {
+  const currentDirection = direction === 0 ? 0 : direction - 180;
   return {
     path: 'M 148.5 0 C 87.43 0 37.747 49.703 37.747 110.797 C 37.747 201.823 137.476 290.702 141.723 294.442 C 143.659 296.147 146.079 297.001 148.5 297.001 C 150.921 297.001 153.341 296.148 155.278 294.442 C 159.523 290.703 259.253 201.824 259.253 110.797 C 259.253 49.703 209.57 0 148.5 0 Z',
-    rotation: direction - 180,
+    rotation: currentDirection,
     fillColor: "#0cc000",
     fillOpacity: 1,
     strokeColor: "#088000",
@@ -73,17 +61,25 @@ export const getBusDirectionOnRoute = ({vehicle, nextStopLocation}) => {
   if (!nextStopLocation) {
     return 0;
   }
-  const stopLocation = {
+  let nextLocation = {
     lat: nextStopLocation.Latitude,
     lng: nextStopLocation.Longitude
   };
+
+  if (!!vehicle.points && vehicle.points.length !== 0) {
+    nextLocation = {
+        lat: vehicle.points[0].latitude,
+        lng: vehicle.points[0].longitude
+    }
+  }
+
   const busLocation = {
     lat: vehicle.position.latitude,
     lng: vehicle.position.longitude
   };
 
   // calculate direction from bus to stop
-  return window.google.maps.geometry.spherical.computeHeading(busLocation, stopLocation);
+  return window.google.maps.geometry.spherical.computeHeading(busLocation, nextLocation);
 };
 
 export const getMyLocation = (setMyLocation) => {
@@ -95,4 +91,32 @@ export const getMyLocation = (setMyLocation) => {
       });
     });
   }
+}
+
+// isEquals function for comparing two objects
+export const isEquals = (obj1, obj2) => {
+    return JSON.stringify(obj1) === JSON.stringify(obj2);
+}
+
+// function for smooth animation of bus movement which get two points and return array of points between them
+export const getPointsBetween = (start, end) => {
+  const ITERATIONS = 20;
+  if (isEquals(start, end)) {
+    console.log('start and end points are equal');
+    return [];
+  }
+  const points = [];
+  const startLat = Number(start.latitude);
+  const startLng = Number(start.longitude);
+  const endLat = Number(end.latitude);
+  const endLng = Number(end.longitude);
+  const latStep = (endLat - startLat) / ITERATIONS;
+  const lngStep = (endLng - startLng) / ITERATIONS;
+  for (let i = 0; i < ITERATIONS; i++) {
+    points.push({
+      latitude: startLat + latStep * i,
+      longitude: startLng + lngStep * i,
+    });
+  }
+  return points;
 }

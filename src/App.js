@@ -13,13 +13,12 @@ import {MAP_CENTER, MAP_OPTIONS} from "./constants";
 import {AutocompleteForm, BusMarkers, StopMarkers, TopMenu, MyLocationMarker} from "./components";
 
 import './App.css';
-import {getBusesOnRoutes} from "./service/getBusesOnRoutes";
+// import {getBusesOnRoutes} from "./service/getBusesOnRoutes";
 
 function App() {
   const [directionsService, setDirectionsService] = useState(null);
   const [directions, setDirections] = useState(null);
   const [directionRoutes, setDirectionRoutes] = useState([]); //
-  const [buses, setBuses] = useState([]); //
   const [jsonData, setJsonData] = useState([]);
   const [stopsData, setStopsData] = useState([]);
   const [routeId, setRouteId] = useState("-1"); // -1 - turned off, 0 - all routes, 1-* - route number
@@ -48,7 +47,7 @@ function App() {
     getMyLocation(setMyLocation);
   }, [getVehicles, isLoaded]);
 
-  useEffect(() => {
+  /*useEffect(() => {
     if (jsonData.length === 0) {
       return;
     }
@@ -58,15 +57,7 @@ function App() {
     } else {
       setBuses(jsonData.entities);
     }
-  }, [jsonData, routeId]);
-
-  // get buses on Route from directionRoutes
-  useEffect(() => {
-    if (directionRoutes.length === 0) {
-      return;
-    }
-    getBusesOnRoutes(directionRoutes, setBuses);
-  }, [directionRoutes]);
+  }, [jsonData, routeId]);*/
 
   // Function to add polyline instances to the state
   const addPolylineInstance = (polyline) => {
@@ -97,21 +88,22 @@ function App() {
         polylineInstances={polylineInstances}
         setStopsData={setStopsData}
         setSelectedRoute={setSelectedRoute}
-        setBuses={setBuses}
+        // setBuses={setBuses}
         setRouteId={setRouteId}
         setPolylineInstances={setPolylineInstances}
         handleSetMyLocation={handleSetMyLocation}
-        liveBusesFunction={() => getBusesOnRoutes(directionRoutes, setBuses)}
+        // liveBusesFunction={() => getBusesOnRoutes(directionRoutes, setBuses)}
       />
       <GoogleMap
         mapContainerStyle={{height: "calc(100vh - 60px)", width: "100vw"}}
         center={mapCenter}
         zoom={12}
         onLoad={handleLoad}
+        options={{streetViewControl: false, fullscreenControl: false}}
       >
         <MyLocationMarker myLocation={myLocation}/>
         {directions && <DirectionsRenderer directions={directions}/>}
-        <BusMarkers buses={buses} stopsData={stopsData}/>
+        {directionRoutes.length > 0 && <BusMarkers directionRoutes={directionRoutes} stopsData={stopsData}/>}
         {/* Draw Markers with bus stops */}
         <StopMarkers stopsData={stopsData.filter((stop) => stop.RouteId === routeId)}/>
         {/*  Draw Polyline from provided points */}

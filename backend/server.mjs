@@ -95,7 +95,7 @@ app.get("/buses/:RouteId", async (req, res) => {
                 headers: { "Access-Control-Allow-Origin": "*" }
             });
             const busInfoJson = await busInfo.json();
-            const nextStop = busInfoJson.stopTimes[0];
+            const nextStop = bus.vehicle.currentStatus === 'IN_TRANSIT_TO' ? busInfoJson.stopTimes[0] : busInfoJson.stopTimes[1];
             const nextStopLocation = stopsOnRoute.find((stop) => stop.Code === nextStop?.Code);
             return { ...bus, nextStopLocation, nextStops: busInfoJson }
         }));
